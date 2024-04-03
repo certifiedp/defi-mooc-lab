@@ -140,8 +140,6 @@ contract LiquidationOperator is IUniswapV2Callee {
     address WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address me = address(this);
-    address USDT_WETH_PAIR_ADDRESS = address(USDT_WETH_PAIR);
-    address WBTC_WETH_PAIR_ADDRESS = address(WBTC_WETH_PAIR);
     IERC20 USDT_POOL = IERC20(USDT);
     IERC20 WBTC_POOL = IERC20(WBTC);
     IWETH WETH_POOL = IWETH(WETH);
@@ -244,19 +242,29 @@ contract LiquidationOperator is IUniswapV2Callee {
         bytes calldata
     ) external override {
         // TODO: implement your liquidation logic
-
-
         // 2.0. security checks and initializing variables
-        //    *** Your code here ***
+        require(msg.sender == address(USDT_WETH_PAIR));
+
+        uint256 WETH_POOL_1;
+        uint256 USDT_RESERVE;
+        (USDT_RESERVE, WETH_POOL_1, ) = USDT_WETH_PAIR.getReserves();
+
+
+        uint256 WETH_POOL_2;
+        uint256 WBTC_RESERVE;
+        (WBTC_RESERVE, WETH_POOL_2, ) = WBTC_WETH_PAIR.getReserves();
 
         // 2.1 liquidate the target user
-        //    *** Your code here ***
+        USDT_POOL.approve(address(LENDING_POOL), amount1);
+        LENDING_POOL.liquidationCall(WBTC,
+         USDT,
+         TARGET_ADDRESS,
+         amount1,
+         false);
 
         // 2.2 swap WBTC for other things or repay directly
-        //    *** Your code here ***
 
         // 2.3 repay
-        //    *** Your code here ***
         
         // END TODO
     }
