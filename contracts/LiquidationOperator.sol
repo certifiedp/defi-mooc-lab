@@ -136,7 +136,11 @@ contract LiquidationOperator is IUniswapV2Callee {
     uint8 public constant health_factor_decimals = 18;
 
     // TODO: define constants used in the contract including ERC-20 tokens, Uniswap Pairs, Aave lending pools, etc. */
-    //    *** Your code here ***
+    address target_address = 0x59CE4a2AC5bC3f5F225439B2993b86B42f6d3e9F;
+    address USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7; 
+    address WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    address WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    ILendingPool lending_pool = ILendingPool(0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9);
     // END TODO
 
     // some helper function, it is totally fine if you can finish the lab without using these function
@@ -179,7 +183,6 @@ contract LiquidationOperator is IUniswapV2Callee {
 
     constructor() {
         // TODO: (optional) initialize your contract
-        //   *** Your code here ***
         // END TODO
     }
 
@@ -192,7 +195,7 @@ contract LiquidationOperator is IUniswapV2Callee {
     // required by the testing script, entry for your liquidation call
     function operate() external {
         // TODO: implement your liquidation logic
-        
+
         uint256 totalCollateralETH;
         uint256 totalDebtETH;
         uint256 availableBorrowsETH;
@@ -206,7 +209,7 @@ contract LiquidationOperator is IUniswapV2Callee {
             currentLiquiationThreshold,
             ltv,
             healthFactor
-        ) = ILendingPool.getUserAccountData(target_address);
+        ) = lending_pool.getUserAccountData(target_address);
         require (
             healthFactor < (10 ** health_factor_decimals),
             "Insufficient"
