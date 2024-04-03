@@ -134,13 +134,14 @@ interface IUniswapV2Pair {
 
 contract LiquidationOperator is IUniswapV2Callee {
     uint8 public constant health_factor_decimals = 18;
-
-    // TODO: define constants used in the contract including ERC-20 tokens, Uniswap Pairs, Aave lending pools, etc. */
+    uint256 constant amount_repay = 2916378221684;
     address target_address = 0x59CE4a2AC5bC3f5F225439B2993b86B42f6d3e9F;
     address USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7; 
     address WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address me = address(this);
     ILendingPool lending_pool = ILendingPool(0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9);
+    IERC20 usdt_pool = IERC20(USDT);
     // END TODO
 
     // some helper function, it is totally fine if you can finish the lab without using these function
@@ -187,9 +188,7 @@ contract LiquidationOperator is IUniswapV2Callee {
     }
 
     receive() external payable {
-    // TODO: add a `receive` function so that you can withdraw your WETH
-    //   *** Your code here ***
-    // END TODO
+        require(msg.sender == address(WETH));
     }
 
     // required by the testing script, entry for your liquidation call
@@ -212,7 +211,7 @@ contract LiquidationOperator is IUniswapV2Callee {
         ) = lending_pool.getUserAccountData(target_address);
         require (
             healthFactor < (10 ** health_factor_decimals),
-            "Insufficient"
+            "Insufficient Health Factor"
         );
 
         // 1. get the target user account data & make sure it is liquidatable
@@ -224,7 +223,7 @@ contract LiquidationOperator is IUniswapV2Callee {
         // we should borrow USDT, liquidate the target user and get the WBTC, then swap WBTC to repay uniswap
         // (please feel free to develop other workflows as long as they liquidate the target user successfully)
         //    *** Your code here ***
-
+        USDT_PAIR.swap(0, amount_repay, me, abi.encode("flash loan"));
         // 3. Convert the profit into ETH and send back to sender
         //    *** Your code here ***
 
