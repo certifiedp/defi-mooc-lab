@@ -183,16 +183,34 @@ contract LiquidationOperator is IUniswapV2Callee {
         // END TODO
     }
 
+    receive() external payable {
     // TODO: add a `receive` function so that you can withdraw your WETH
     //   *** Your code here ***
     // END TODO
+    }
 
     // required by the testing script, entry for your liquidation call
     function operate() external {
         // TODO: implement your liquidation logic
-
-        // 0. security checks and initializing variables
-        //    *** Your code here ***
+        
+        uint256 totalCollateralETH;
+        uint256 totalDebtETH;
+        uint256 availableBorrowsETH;
+        uint256 currentLiquiationThreshold;
+        uint256 ltv;
+        uint256 healthFactor;
+        (
+            totalCollateralETH,
+            totalDebtETH,
+            availableBorrowsETH,
+            currentLiquiationThreshold,
+            ltv,
+            healthFactor
+        ) = ILendingPool.getUserAccountData(target_address);
+        require (
+            healthFactor < (10 ** health_factor_decimals),
+            "Insufficient"
+        );
 
         // 1. get the target user account data & make sure it is liquidatable
         //    *** Your code here ***
