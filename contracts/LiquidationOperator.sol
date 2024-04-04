@@ -263,9 +263,21 @@ contract LiquidationOperator is IUniswapV2Callee {
          false);
 
         // 2.2 swap WBTC for other things or repay directly
+        uint COLLATERAL_WBTC = WBTC_POOL.balanceOf(me);
+        WBTC_POOL.transfer(address(WBTC_WETH_PAIR), COLLATERAL_WBTC);
+        uint256 WETH_OUT = getAmountOut(
+            COLLATERAL_WBTC,
+            WBTC_RESERVE,
+            WBTC_RESERVE
+        );
+        WBTC_WETH_PAIR.swap(0, WETH_OUT, me, "paid");
 
         // 2.3 repay
-        
-        // END TODO
+        uint256 WETH_REPAY = getAmountIn(
+            amount1,
+            WETH_POOL_1,
+            USDT_RESERVE
+        );
+        WETH_POOL.transfer(address(USDT_WETH_PAIR), WETH_REPAY);
     }
 }
